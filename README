@@ -1,0 +1,57 @@
+##############
+# 0. License #
+##############
+
+eand.py package (Easy Algebraic Numerical Differentiation for Python)
+Copyright (C) 2013 Tu-Hoa Pham
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+##################
+# 1. What is it? #
+##################
+
+eand.py (Easy Algebraic Numerical Differentiation for Python) is a
+package implementing numerical differentiation algorithms based on the
+algebraic framework initiated in Fliess and Sira-Ramirez 2003 [1].
+
+###############
+# 2. Contents #
+###############
+
+The current version contains the following sub-package:
+
+  a. kmand: a one-dimensional (kappa,mu)-algebraic numerical
+     differentiator based on Mboup et al. 2009 [2].
+
+##########################
+# 3. Future developments #
+##########################
+
+Future work will more or less deal with the following issues:
+  a. Multi-dimensional numerical differentiation
+  b. Fine-tuning of differentiation parameters
+
+#################
+# 4. References #
+#################
+
+[1] FLIESS, M., AND SIRA-RAM´I REZ, H. 2003.
+An algebraic framework for linear identification.
+ESAIM: Control, Optimisation and Calculus of Variations 9 (7), 151–168.
+
+[2] MBOUP, M., JOIN, C., AND FLIESS, M. 2009.
+Numerical differentiation with annihilators in noisy environment.
+Numerical Algorithms 50, 4, 439–467.
+
