@@ -50,14 +50,13 @@ noise_var = (1./(10.**(SNR/10.)-1.))*(1./Ns)*sum(x**2.);
 noise_sd = sqrt(noise_var);
 noise = np.random.normal(noise_mean,noise_sd,Ns)
 signalNoisy = signalRefSeq[0] + noise
-signalNoisy = signalRefSeq[0]
 
 # Numerical differentiation parameters
 n = 1;                         # derivative order to estimate
-N = 2;                         # Taylor expansion order
-kappa = 3;                     # differentiator parameter
-mu = 2;                        # differentiator parameter
-M = 60;                        # estimation samples
+N = 1;                         # Taylor expansion order
+kappa = 0;                     # differentiator parameter
+mu = 0;                        # differentiator parameter
+M = 40;                        # estimation samples
 lambdaOptType= 'noisyenv';     # 'mismodel' or 'noisyenv'
 xi = 0.5;                      # xi parameter for real lambda
 causality = 'causal';          # 'causal' or 'anticausal'
@@ -68,9 +67,19 @@ dirDiff = DirDiff(n,N,kappa,mu,M,Ts,xi,lambdaOptType,causality)
 # Differentiation of the noisy signal
 (tPost,dPost) = dirDiff.differentiate(t,signalNoisy)
 
-# Plot it!
-plt.figure(4)
-plt.plot(t, signalRefSeq[n], 'b', label='Ref')
+# Plot initial noisy signal
+plt.figure(-1)
+plt.plot(t, signalRefSeq[0], 'b', label='reference')
+plt.plot(t, signalNoisy, 'r', label='noisy signal')
+plt.grid()
+plt.axhline(color='k')
+plt.axvline(color='k')
+plt.legend()
+plt.title('Initial noisy signal')
+
+# Plot derivative estimate
+plt.figure(n)
+plt.plot(t, signalRefSeq[n], 'b', label='reference')
 plt.plot(tPost, dPost, 'r', label='estimate')
 plt.grid()
 plt.axhline(color='k')

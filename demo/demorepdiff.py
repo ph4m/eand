@@ -53,15 +53,14 @@ signalNoisy = signalRefSeq[0] + noise
 
 # Numerical differentiation parameters
 nTarget = 2;                   # derivative order to estimate
-qVec = [2,1,3];                # model complexity parameters
-kappaVec = [1,3,2];            # differentiator parameters
-muVec = [3,2,1];               # differentiator parameters
-MVec = [40,100,60];            # estimation samples
+qVec = [0,0,0];                # model complexity parameters
+kappaVec = [0,0,0];            # differentiator parameters
+muVec = [0,0,0];               # differentiator parameters
+MVec = [60,60,60];            # estimation samples
 lambdaOptType= 'noisyenv';     # 'mismodel' or 'noisyenv'
 xi = 0.5;                      # xi parameter for real lambda
 causality = 'causal';          # 'causal' or 'anticausal'
 rediffSeq = [-1,-1,1]          # estimates order to use for redifferentiation
-
 
 # Construction of the (kappa,mu)-algebraic numerical differentiator
 repDiff = RepDiff(nTarget,qVec,kappaVec,muVec,MVec,Ts,xi,lambdaOptType,causality,rediffSeq)
@@ -69,7 +68,17 @@ repDiff = RepDiff(nTarget,qVec,kappaVec,muVec,MVec,Ts,xi,lambdaOptType,causality
 # Differentiation of the noisy signal
 (tPostSeq,dPostSeq) = repDiff.differentiate(t,signalNoisy)
 
-# Plot it!
+# Plot initial noisy signal
+plt.figure(-1)
+plt.plot(t, signalRefSeq[0], 'b', label='reference')
+plt.plot(t, signalNoisy, 'r', label='noisy signal')
+plt.grid()
+plt.axhline(color='k')
+plt.axvline(color='k')
+plt.legend()
+plt.title('Initial noisy signal')
+
+# Plot successive derivative estimates
 for n in range(nTarget+1):
     plt.figure(n)
     plt.plot(t, signalRefSeq[n], 'b', label='reference')
