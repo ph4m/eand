@@ -232,15 +232,15 @@ class DirDiff:
         Compute exact derivatives of the Jacobi polynomials weight function
         '''
         # Supported parameters
-        kappa_max = 6;
-        mu_max = 6;
-        n_max = 2;
+        kappaMax = 6;
+        muMax = 6;
+        nMax = 2;
         
         # Index of the weight function derivative
-        case = kappa*(mu_max+1)*(n_max+1) + mu*(n_max+1) + n + 1;
+        case = kappa*(muMax+1)*(nMax+1) + mu*(nMax+1) + n + 1;
         
         # Find the corresponding exact derivative    
-        if case > (kappa_max+1)*(mu_max+1)*(n_max+1):
+        if case > (kappaMax+1)*(muMax+1)*(nMax+1):
             print kappa, mu, n, 'combination not supported'
         else:
             if case == 1: res = 1
