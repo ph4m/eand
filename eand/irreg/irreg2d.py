@@ -73,8 +73,6 @@ class Irreg2D:
         self.Ns = len(t1)
         self.buildIntMap()
         self.initTriangles()
-        
-
     
     def calcGxy(self,x,y,a,b,c,d):
         Gxy = ((b-x)**self.alpha1)*((a-x)**self.beta1)*((d-y)**self.alpha2)*((c-y)**self.beta2)
@@ -101,10 +99,6 @@ class Irreg2D:
         self.sortInd = np.argsort(t1Sort)
         t1Sort = t1Sort[self.sortInd]
         t2Sort = np.array(t2)[self.sortInd]
-        '''if len(signal) > 0:
-            signalSort = np.array(signal)[sortInd]
-        else:
-            signalSort = []'''
         return (t1Sort,t2Sort)
     
     def sortSignal(self,signal):
@@ -181,11 +175,11 @@ class Irreg2D:
             coord1 = np.array([self.t1[p1],self.t2[p1]])
             coord2 = np.array([self.t1[p2],self.t2[p2]])
             coord3 = np.array([self.t1[p3],self.t2[p3]])
-            areaLoc = 0.5 * norm( np.cross( coord2-coord1, coord3-coord1 ) )
+            triAreaLoc = 0.5 * norm( np.cross( coord2-coord1, coord3-coord1 ) )
             ptToTri[p1].append(i)
             ptToTri[p2].append(i)
             ptToTri[p3].append(i)
-            triAreas[i] = areaLoc
+            triAreas[i] = triAreaLoc
         self.ptToTri = ptToTri
         self.triAreas = triAreas
         
@@ -210,7 +204,7 @@ class Irreg2D:
         if plotNow:
             plt.show()
     
-    def plotEstimate(self,t1Post,t2Post,dPost,waitPlot=0):
+    def plotScatter(self,t1Post,t2Post,dPost,waitPlot=0):
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
         ax.scatter(t1Post,t2Post,dPost)
