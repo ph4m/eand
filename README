@@ -30,10 +30,15 @@ algebraic framework initiated in Fliess and Sira-Ramirez 2003 [1].
 # 2. Contents #
 ###############
 
-The current version contains the following sub-package:
+The current version contains the following sub-packages:
 
-  a. kmand: a one-dimensional (kappa,mu)-algebraic numerical
-     differentiator based on Mboup et al. 2009 [2].
+  a. kmand: (Kappa,Mu)-Algebraic Numerical Differentiation
+     A one-dimensional derivative estimator working on regularly-spaced
+     samples based on Mboup et al. 2009 [2].
+     
+  b. mddif: MultiDimensional Differentiation on Irregular Grids
+     A multidimensional derivative estimator handling irregular sampling
+     grids based on Riachy et al. 2011 [3].
 
 ##########################
 # 3. Future developments #

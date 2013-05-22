@@ -17,4 +17,5 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from multidiff import MultiDiff
+from multidiffrep import MultiDiffRep
 from derivativesgxy import DerivativesGxy

@@ -48,7 +48,7 @@ class MultiDiff:
         case: index of the partial derivative of weight function G to consider
         intPoints: list of admissible points for derivative estimation
         intMap: list of integration points associated to each element of intPoints
-        tPost: admissible coordinates for derivative estimation
+        tPostVec: admissible coordinates for derivative estimation
         partitionCells: cells forming a partition of the sampling space
         partitionCenters: centers of each partition cell
         nCells: number of cells
@@ -68,7 +68,7 @@ class MultiDiff:
     case = 0
     intPoints = []
     intMap = [[]]
-    tPost = []
+    tPostVec = []
     partitionCells = []
     partitionCenters = []
     nCells = 0
@@ -89,7 +89,7 @@ class MultiDiff:
         self.betaVec = np.array([i[2] for i in paramVec])
         self.halfWindowVec = np.array([i[3] for i in paramVec])
         # Make sure tVec is sorted along the first axis
-        self.tVec = self.sortAxis(tVec)
+        self.tVec = self.sortAlongFirstAxis(tVec)
         # Build partition over the sampling space
         self.initPartition()
         self.initCells()
@@ -126,7 +126,7 @@ class MultiDiff:
             print 'ERROR:', 'parameter sequence', self.paramVec, 'is not supported'
             exit()
         
-    def sortAxis(self,tVec):
+    def sortAlongFirstAxis(self,tVec):
         tVecSorted = []
         self.sortInd = np.argsort(np.array(tVec[0]))
         for t in tVec:
@@ -144,6 +144,15 @@ class MultiDiff:
     
 
     def differentiate(self,signal):
+        '''
+        Numerical differentiation method
+        Once the differentiator is constructed, can be applied to compute derivative estimates
+        Input:
+            signal: samples of the signal to differentiate
+        Outputs:
+            tPostVec: list of discreet estimation times for dimension 1 to nDim
+            dPost: derivative estimates
+        '''
         signalSorted = np.array(signal)[self.sortInd]
         dPost = []
         for i in self.intPoints:
@@ -187,8 +196,6 @@ class MultiDiff:
                 self.intPoints.append(i)
                 correspTable[i] = pointInCounter
                 pointInCounter += 1
-                #for iCell in self.pointToCells[i]:
-                #    intPointsPerCell[iCell] += 1
                 intPointsPerCell[self.pointToCells[i]] += 1
                 while self.tVec[0][i]-self.tVec[0][iMinLoc] > self.halfWindowVec[0]:
                     iMinLoc += 1

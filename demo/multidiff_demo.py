@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import matplotlib.pyplot as plt
 from math import cos,sin
 import numpy as np
-from eand.mddig import MultiDiff
+from eand.mddig.multidiff import MultiDiff
 
 print 'Initializing estimation parameters...'
 
@@ -43,7 +43,6 @@ alpha2 = 0
 beta2 = 0
 T1 = 0.25
 T2 = 0.25
-
 
 '''
 # 1D case
