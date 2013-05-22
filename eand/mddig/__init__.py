@@ -16,5 +16,5 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from monodiff import MonoDiff
-from monodiffrep import MonoDiffRep
+from multidiff import MultiDiff
+from derivativesgxy import DerivativesGxy

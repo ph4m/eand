@@ -17,4 +17,4 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from kmand.__init__ import *
-from irrgrid.__init__ import *
+from mddig.__init__ import *
