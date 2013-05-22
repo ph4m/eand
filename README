@@ -47,11 +47,15 @@ Future work will more or less deal with the following issues:
 # 4. References #
 #################
 
-[1] FLIESS, M., AND SIRA-RAM´I REZ, H. 2003.
+[1] FLIESS, M., AND SIRA-RAMIREZ, H. 2003.
 An algebraic framework for linear identification.
 ESAIM: Control, Optimisation and Calculus of Variations 9 (7), 151–168.
 
 [2] MBOUP, M., JOIN, C., AND FLIESS, M. 2009.
 Numerical differentiation with annihilators in noisy environment.
 Numerical Algorithms 50, 4, 439–467.
+
+[3] RIACHY, S., MBOUP, M., AND RICHARD, J.-P. 2011.
+Numerical differentiation on irregular grids.
+In WIFAC.
 

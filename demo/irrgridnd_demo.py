@@ -59,11 +59,11 @@ signal = [cos(2*sum([t[i] for t in tVec])) for i in range(len(tVec[0]))]
 print 'Buiding differentiator...'
 irrGridND = IrrGridND(paramVec,tVec)
 
-print irrGridND.case
-
+'''
 # IMPORTANT
 print 'Sorting signal vector...'
 signal = irrGridND.sortSignal(signal)
+'''
 
 print 'Plotting partition...'
 irrGridND.plotPartition(0)

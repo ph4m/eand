@@ -21,7 +21,12 @@ import matplotlib.pyplot as plt
 from numpy.linalg import norm
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
+from derivativesgxy import DerivativesGxy
 
+'''
+Multidimensional derivative estimation with algebraic numerical differentiation
+See 'Numerical differentiation on irregular grids' (Riachy et al., 2011)
+'''
 class IrrGridND:
     '''
     classdocs
@@ -33,7 +38,6 @@ class IrrGridND:
     tVec = []
     sortInd = []
     nSamples = 0.
-    #G = np.array([[]])
     intPoints = []
     intMap = [[]]
     partitionCells = []
@@ -47,11 +51,13 @@ class IrrGridND:
         Constructor
         '''
         self.nDim = len(paramVec)
+        self.paramVec = paramVec
         self.nVec = np.array([i[0] for i in paramVec])
         self.alphaVec = np.array([i[1] for i in paramVec])
         self.betaVec = np.array([i[2] for i in paramVec])
         self.halfWindowVec = np.array([i[3] for i in paramVec])
         self.case = self.calcCase()
+        self.initCalcPartialGxy()
         self.tVec = self.sortAxis(tVec)
         self.nSamples = len(tVec[0])
         self.buildIntMap()
@@ -60,29 +66,38 @@ class IrrGridND:
     
     def calcCase(self):
         n1Max = 2
+        alpha1Max = 4
+        beta1Max = 4
         n2Max = 2
-        alpha1Max = 2
-        beta1Max = 2
-        alpha2Max = 2
-        beta2Max = 2
+        alpha2Max = 4
+        beta2Max = 4
         paramSeq = []
         for dim in range(self.nDim):
             paramSeq.append(self.nVec[dim])
             paramSeq.append(self.alphaVec[dim])
             paramSeq.append(self.betaVec[dim])
         if self.nDim == 1:
-            paramPos = 1+ np.array([n1Max,alpha1Max,beta1Max])
-        elif self.nDim ==2:
-            paramPos = 1+ np.array([n1Max,alpha1Max,beta1Max,n2Max,alpha2Max,beta2Max])
-        case = sum([paramSeq[i]*np.product(paramPos[(i+1):]) for i in range(len(paramSeq)-1)])
+            for _ in range(3):
+                paramSeq.append(0)
+        paramPos = 1+ np.array([n1Max,alpha1Max,beta1Max,n2Max,alpha2Max,beta2Max])
+        case = sum([paramSeq[i]*np.product(paramPos[(i+1):]) for i in range(len(paramSeq)-1)])+paramSeq[len(paramSeq)-1]
         return case
+    
+    def initCalcPartialGxy(self):
+        try:
+            derivativesGxy = DerivativesGxy(self.halfWindowVec,self.case)
+            self.calcPartialGxy = derivativesGxy.partialGxy
+        except:
+            print 'ERROR:', 'parameter sequence', self.paramVec, 'is not supported'
+            exit()
+        
     
     def calcGxy1D(self,coord):
         Gxy = np.product([((self.halfWindowVec[dim]-coord[dim])**self.alphaVec[dim])*((-self.halfWindowVec[dim]-coord[dim])**self.betaVec[dim]) for dim in range(self.nDim)])
         if self.case == 12: # n1=alpha1=beta1=1
             partialGxy = -2*coord[0]
         else:
-            print '(n1=%d,n2=%d,alpha1=%d,beta1=%d,alpha2=%d,beta2=%d) not supported' % (self.n1,self.n2,self.alpha1,self.beta1,self.alpha2,self.beta2)
+            print '(n1=%d,alpha1=%d,beta1=%d) not supported' % (self.nVec[0],self.alphaVec[0],self.betaVec[0])
         return (Gxy,partialGxy)
     
     def calcGxy2D(self,coord):
@@ -92,7 +107,7 @@ class IrrGridND:
         elif self.case == 12: # n1=alpha1=beta1=0,n2=alpha2=beta2=1
             partialGxy = -2*coord[1]
         else:
-            print '(n1=%d,n2=%d,alpha1=%d,beta1=%d,alpha2=%d,beta2=%d) not supported' % (self.n1,self.n2,self.alpha1,self.beta1,self.alpha2,self.beta2)
+            print '(n1=%d,alpha1=%d,beta1=%d,n2=%d,alpha2=%d,beta2=%d) not supported' % (self.nVec[0],self.alphaVec[0],self.betaVec[0],self.nVec[1],self.alphaVec[1],self.betaVec[1])
         return (Gxy,partialGxy)
         
     def sortAxis(self,tVec):
@@ -108,11 +123,13 @@ class IrrGridND:
     def isInWindow(self,coord):
         return np.product([(coord[dim] <= self.halfWindowVec[dim])*(coord[dim] >= -self.halfWindowVec[dim]) for dim in range(self.nDim)])
     
+    
+    
+    def calcGxy(self,coord):
+        return np.product([((self.halfWindowVec[dim]-coord[dim])**self.alphaVec[dim])*((-self.halfWindowVec[dim]-coord[dim])**self.betaVec[dim]) for dim in range(self.nDim)])
+    
     def differentiate(self,signal):
-        if self.nDim == 1:
-            calcGxy = self.calcGxy1D
-        elif self.nDim == 2:
-            calcGxy = self.calcGxy2D
+        signalSorted = np.array(signal)[self.sortInd]
         dPost = []
         for i in self.intPoints:
             processedCells = [0 for _ in range(self.nCells)]
@@ -125,9 +142,10 @@ class IrrGridND:
                         coordRecentered = np.array(self.partitionCenters[cell]) - np.array([self.tVec[dim][i] for dim in range(self.nDim)])
                         if self.isInWindow(coordRecentered):
                             pVec = self.partitionCells[cell]
-                            integrandVec = [calcGxy([self.tVec[dim][p]-self.tVec[dim][i] for dim in range(self.nDim)]) for p in pVec]
-                            dPostNum = dPostNum + sum([integrandVec[k][1]*signal[pVec[k]] for k in range(len(pVec))])*self.cellVol[cell]
-                            dPostDen = dPostDen + sum([integrandVec[k][0] for k in range(len(pVec))])*self.cellVol[cell]
+                            gxyVec = [self.calcGxy([self.tVec[dim][p]-self.tVec[dim][i] for dim in range(self.nDim)]) for p in pVec]
+                            partialGxyVec = [self.calcPartialGxy([self.tVec[dim][p]-self.tVec[dim][i] for dim in range(self.nDim)]) for p in pVec]
+                            dPostNum = dPostNum + np.dot(partialGxyVec,signalSorted[pVec])*self.cellVol[cell]
+                            dPostDen = dPostDen + sum(gxyVec)*self.cellVol[cell]
             dPost.append(dPostNum/dPostDen)
         dPost = np.array(dPost)
         return (self.tPostVec,dPost)

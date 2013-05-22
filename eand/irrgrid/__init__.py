@@ -16,6 +16,5 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from irrgrid1d import IrrGrid1D
-from irrgrid2d import IrrGrid2D
 from irrgridnd import IrrGridND
+from derivativesgxy import DerivativesGxy
