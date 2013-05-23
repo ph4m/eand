@@ -237,7 +237,7 @@ class MultiDiff:
             for p in pVec:
                 self.pointToCells[p].append(i)
         
-    def plotPartition(self,plotNow=0):
+    def plotPartition(self,plotNow=1):
         plt.figure()
         if self.nDim == 1:
             for cell in self.partitionCells:
@@ -252,7 +252,7 @@ class MultiDiff:
         if plotNow:
             plt.show()
             
-    def plotSlice(self,tPostVec,dPost,coord,val,threshold,plotNow=0):
+    def plotSlice(self,tPostVec,dPost,coord,val,threshold,plotNow=1):
         if self.nDim == 1:
             self.plotScatter(tPostVec, dPost, plotNow)
             return (tPostVec[0],dPost)
@@ -277,7 +277,7 @@ class MultiDiff:
             if plotNow:
                 plt.show()
     
-    def plotScatter(self,tPostVec,dPost,plotNow=0):
+    def plotScatter(self,tPostVec,dPost,plotNow=1):
         if self.nDim == 1:
             plt.figure()
             plt.scatter(tPostVec[0],dPost)
@@ -288,7 +288,7 @@ class MultiDiff:
             plt.show()
 
     
-    def plotSurface(self,tPostVec,dPost,plotNow=0):
+    def plotSurface(self,tPostVec,dPost,plotNow=1):
         fig = plt.figure()
         if self.nDim == 1:
             plt.plot(tPostVec[0],dPost)
