@@ -49,6 +49,8 @@ class MultiDiffRep:
         self.nDiffStep = len(paramVecSeq)
         self.paramVecSeq = paramVecSeq
         self.tVec = tVec
+        self.tPostVecSeq = []
+        #self.differentiators = []
         # Build successive differentiators
         self.buildDifferentiators()
         
@@ -56,6 +58,7 @@ class MultiDiffRep:
         '''
         Construct successive differentiators
         '''
+        self.differentiators = []
         self.differentiators.append(MultiDiff(self.paramVecSeq[0],self.tVec))
         self.tPostVecSeq.append(self.differentiators[0].tPostVec)
         for step in range(1,self.nDiffStep):
@@ -74,7 +77,9 @@ class MultiDiffRep:
             dPostVec: list of derivative estimates for successive differentiation steps
         '''
         dPostSeq = []
-        for step in range(self.nDiffStep):
-            (_,dPost) = self.differentiators[step].differentiate(signal)
+        (_,dPost) = self.differentiators[0].differentiate(signal)
+        dPostSeq.append(dPost)
+        for step in range(1,self.nDiffStep):
+            (_,dPost) = self.differentiators[step].differentiate(dPostSeq[step-1])
             dPostSeq.append(dPost)
         return (self.tPostVecSeq,dPostSeq)

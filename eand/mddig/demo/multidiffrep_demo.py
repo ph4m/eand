@@ -52,15 +52,15 @@ paramVecSeq = [paramVec1,paramVec2]
 tVec = [t1]
 '''
 # 2D case
-paramVec1 = [[n1,alpha1,beta1,T1],[n2,alpha2,beta2,T2]]
-paramVec2 = [[n1,alpha1,beta1,T1],[n2,alpha2,beta2,T2]]
+paramVec1 = [[n1,alpha1,beta1,T1],[n2,alpha2,beta2,T2]] # differentiate first along the first axis
+paramVec2 = [[n2,alpha2,beta2,T2],[n1,alpha1,beta1,T1]] # then along the second coordinate
 paramVecSeq = [paramVec1,paramVec2]
 tVec = [t1,t2]
 
 
 signal = [cos(2*sum([t[i] for t in tVec])) for i in range(len(tVec[0]))]
 
-print 'Buiding successive differentiators...'
+print 'Building successive differentiators...'
 multiDiffRep = MultiDiffRep(paramVecSeq,tVec)
 
 print 'Plotting successive partitions...'
@@ -72,7 +72,7 @@ print 'Commencing differentiation...'
 
 print 'Calculating reference derivative...'
 for step in range(len(paramVecSeq)):
-    tSlice,dSlice = multiDiffRep.differentiators[step].plotSlice(tPostVecSeq[step],dPostSeq[step],1,0.,0.1)
+    tSlice,dSlice = multiDiffRep.differentiators[step].plotSlice(tPostVecSeq[step],dPostSeq[step],1,0.,0.1,0)
     dRef = []
     if step == 0:
         for i in tSlice:
@@ -84,8 +84,8 @@ for step in range(len(paramVecSeq)):
 
 print 'Plotting derivative estimate...'
 for step in range(len(paramVecSeq)):
-    multiDiffRep.differentiators[step].plotScatter(tPostVecSeq[step], dPostSeq[step])
-    multiDiffRep.differentiators[step].plotSurface(tPostVecSeq[step], dPostSeq[step])
+    multiDiffRep.differentiators[step].plotScatter(tPostVecSeq[step], dPostSeq[step],0)
+    multiDiffRep.differentiators[step].plotSurface(tPostVecSeq[step], dPostSeq[step],0)
 
 plt.show()
 
