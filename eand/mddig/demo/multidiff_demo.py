@@ -23,7 +23,7 @@ from eand.mddig.multidiff import MultiDiff
 
 print 'Initializing estimation parameters...'
 
-Ns = 500
+Ns = 4000
 t1Min = -1.0
 t1Max = 1.0
 t2Min = -1.0
@@ -36,14 +36,15 @@ for i in range(Ns):
     t2[i] = t2Min+(t2Max-t2Min)*np.random.random()
 
 n1 = 1
-alpha1 = 1
-beta1 = 1
+alpha1 = 3
+beta1 = 3
 n2 = 0
-alpha2 = 0
-beta2 = 0
+alpha2 = 2
+beta2 = 2
 T1 = 0.25
 T2 = 0.25
 
+'''
 # 1D case
 paramVec = [[n1,alpha1,beta1,T1]]
 tVec = [t1]
@@ -51,9 +52,11 @@ tVec = [t1]
 # 2D case
 paramVec = [[n1,alpha1,beta1,T1],[n2,alpha2,beta2,T2]]
 tVec = [t1,t2]
-'''
 
-signal = [cos(2*sum([t[i] for t in tVec])) for i in range(len(tVec[0]))]
+nDim = len(tVec)
+nSamples = len(tVec[0])
+
+signal = [cos(2*sum([t[i] for t in tVec])) for i in range(nSamples)]
 
 print 'Building differentiator...'
 multiDiff = MultiDiff(paramVec,tVec)
@@ -66,9 +69,10 @@ print 'Commencing differentiation...'
 
 print 'Calculating reference derivative...'
 tSlice,dSlice = multiDiff.plotSlice(tPostVec,dPost,1,0.,0.1,0)
-dRef = []
-for i in tSlice:
-    dRef.append(-2*sin(2*i))
+if sum([paramVec[i][0] for i in range(nDim)]) == 1:
+    dRef = [-2*sin(2*i) for i in tSlice]
+elif sum([paramVec[i][0] for i in range(nDim)]) == 2:
+    dRef = [-4*cos(2*i) for i in tSlice]
 plt.plot(tSlice,dRef,'r.')
 
 print 'Plotting derivative estimate...'
