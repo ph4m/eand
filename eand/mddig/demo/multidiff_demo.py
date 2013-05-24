@@ -39,8 +39,8 @@ n1 = 1
 alpha1 = 3
 beta1 = 3
 n2 = 0
-alpha2 = 2
-beta2 = 2
+alpha2 = 0
+beta2 = 0
 T1 = 0.25
 T2 = 0.25
 

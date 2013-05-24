@@ -23,7 +23,7 @@ from eand.mddig.multidiffrep import MultiDiffRep
 
 print 'Initializing estimation parameters...'
 
-Ns = 4000
+Ns = 500
 t1Min = -1.0
 t1Max = 1.0
 t2Min = -1.0
@@ -44,7 +44,6 @@ beta2 = 0
 T1 = 0.25
 T2 = 0.25
 
-'''
 # 1D case
 paramVec1 = [[n1,alpha1,beta1,T1]]
 paramVec2 = [[n1,alpha1,beta1,T1]]
@@ -56,6 +55,7 @@ paramVec1 = [[n1,alpha1,beta1,T1],[n2,alpha2,beta2,T2]] # differentiate first al
 paramVec2 = [[n2,alpha2,beta2,T2],[n1,alpha1,beta1,T1]] # then along the second coordinate
 paramVecSeq = [paramVec1,paramVec2]
 tVec = [t1,t2]
+'''
 
 nDim = len(tVec)
 nSamples = len(tVec[0])
@@ -88,6 +88,8 @@ for step in range(nDiffStep):
         dRef = [-2*sin(2*i) for i in tSlice]
     elif sum([sum([paramVecSeq[i][j][0] for j in range(nDim)]) for i in range(step+1)]) == 2:
         dRef = [-4*cos(2*i) for i in tSlice]
+    elif sum([sum([paramVecSeq[i][j][0] for j in range(nDim)]) for i in range(step+1)]) == 3:
+        dRef = [8*sin(2*i) for i in tSlice]
     plt.plot(tSlice,dRef,'r.')
 
 plt.show()
