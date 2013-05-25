@@ -63,6 +63,7 @@ class MultiDiff:
     alphaVec = []
     betaVec = []
     halfWindowVec = []
+    alreadySorted = 0
     sortInd = []
     tVec = []
     case = 0
@@ -74,22 +75,37 @@ class MultiDiff:
     nCells = 0
     partitionCellsPost = []
     pointToCells = [[]]
-    
+    nSamplesSorted = 0
+    toNextValueSorted = []
+    halfWindowIncrements = []
+    dtVec = []
 
-    def __init__(self,paramVec,tVec):
+    def __init__(self,paramVec,tVec,alreadySorted=0,nSamplesSorted=[]):
         '''
         Constructor
         '''
         # Store differentiation parameters into local attributes
         self.paramVec = paramVec
-        self.nDim = len(paramVec)
+        self.nDim = len(tVec)
         self.nSamples = len(tVec[0])
         self.nVec = np.array([i[0] for i in paramVec])
         self.alphaVec = np.array([i[1] for i in paramVec])
         self.betaVec = np.array([i[2] for i in paramVec])
         self.halfWindowVec = np.array([i[3] for i in paramVec])
-        # Make sure tVec is sorted along the first axis
-        self.tVec = self.sortAlongFirstAxis(tVec)
+            # Make sure tVec is sorted along the first axis
+        self.tVec = np.array(tVec)
+        self.alreadySorted = alreadySorted
+        if self.alreadySorted:
+            self.sortInd = np.array(range(len(tVec[0])))
+            self.nSamplesSorted = nSamplesSorted
+            self.toNextValueSorted = [int(round(np.product([nSamplesSorted[dim] for dim in range(i+1,alreadySorted)]))) for i in range(alreadySorted)]
+            self.dtVec = [self.tVec[i][self.toNextValueSorted[i]]-self.tVec[i][0] for i in range(alreadySorted)]
+            #self.halfWindowSortedIncrements = [int(np.ceil(self.halfWindowVec[dim]/self.dtVec[dim]))*self.toNextValueSorted[dim] for dim in range(alreadySorted)]
+            self.halfWindowIncrements = [int(np.ceil(self.halfWindowVec[dim]/self.dtVec[dim])) for dim in range(alreadySorted)]
+            #self.halfWindowSorted = [np.ceil(self.halfWindowVec[dim]/self.dtVec[dim])*self.toNextValueSorted[dim] for dim in range(alreadySorted)]
+        else:
+            self.sortInd = np.argsort(np.array(tVec[0]))
+            self.tVec = [self.tVec[dim][self.sortInd] for dim in range(self.nDim)]
         # Build partition over the sampling space
         self.initPartition()
         self.initCells()
@@ -125,16 +141,24 @@ class MultiDiff:
         except:
             print 'ERROR:', 'parameter sequence', self.paramVec, 'is not supported'
             exit()
-        
+            
+    '''
     def sortAlongFirstAxis(self,tVec):
         tVecSorted = []
-        self.sortInd = np.argsort(np.array(tVec[0]))
+        if self.alreadySorted:
+            self.sortInd = np.array(range(len(tVec[0])))
+        else:
+            self.sortInd = np.argsort(np.array(tVec[0]))
         for t in tVec:
             tVecSorted.append(np.array(t)[self.sortInd])
         return (np.array(tVecSorted))
+    '''
     
     def sortSignal(self,signal):
-        return np.array(signal)[self.sortInd]
+        if self.alreadySorted:
+            return np.array(signal)
+        else:
+            return np.array(signal)[self.sortInd]
     
     def isInWindow(self,coord):
         return np.product([(coord[dim] <= self.halfWindowVec[dim])*(coord[dim] >= -self.halfWindowVec[dim]) for dim in range(self.nDim)])
@@ -173,36 +197,47 @@ class MultiDiff:
             dPost.append(dPostNum/dPostDen)
         dPost = np.array(dPost)
         return (self.tPostVec,dPost)
-    
-
+        
     def buildIntMap(self):
         self.intMap = [[] for _ in range(self.nSamples)]
         tMinVec = [min(t) for t in self.tVec]
         tMaxVec = [max(t) for t in self.tVec]
-        iMinFirstAxis = 0
-        iMaxFirstAxis = self.nSamples-1
-        while self.tVec[0][iMinFirstAxis]-tMinVec[0] < self.halfWindowVec[0]:
-            iMinFirstAxis += 1
-        while tMaxVec[0]-self.tVec[0][iMaxFirstAxis] < self.halfWindowVec[0]:
-            iMaxFirstAxis -= 1
+        if self.alreadySorted:
+            iMinFirstAxis = self.halfWindowIncrements[0]*self.toNextValueSorted[0]
+            iMaxFirstAxis = self.nSamples-iMinFirstAxis-1
+        else:
+            iMinFirstAxis = 1
+            iMaxFirstAxis = self.nSamples-1
+            while self.tVec[0][iMinFirstAxis]-tMinVec[0] < self.halfWindowVec[0]:
+                iMinFirstAxis += 1
+            while tMaxVec[0]-self.tVec[0][iMaxFirstAxis] < self.halfWindowVec[0]:
+                iMaxFirstAxis -= 1
         self.intPoints = []
-        iMinLoc = 0
+        iMinLoc = 1
         iMaxLoc = iMinFirstAxis
         intPointsPerCell = np.array([0 for _ in range(self.nCells)])
         correspTable = [-1 for _ in range(self.nSamples)]
-        pointInCounter = 0
-        for i in range(iMinFirstAxis,iMaxFirstAxis+1):
-            if np.product([(self.tVec[dim][i]-tMinVec[dim] >= self.halfWindowVec[dim])*(tMaxVec[dim]-self.tVec[dim][i] >= self.halfWindowVec[dim]) for dim in range(1,self.nDim)]):
+        pointsInCounter = 0
+        if self.alreadySorted:
+            iTest = []
+            for i in range(iMinFirstAxis,iMaxFirstAxis+1):
+                iSeqSorted = [round((self.tVec[dim][i]-self.tVec[dim][0])/self.dtVec[dim]) for dim in range(self.alreadySorted)]
+                if np.product([(iSeqSorted[dim] >= self.halfWindowIncrements[dim])*(iSeqSorted[dim] <= self.nSamplesSorted[dim]-self.halfWindowIncrements[dim]) for dim in range(self.alreadySorted)]):
+                    iTest.append(i)
+        else:
+            iTest = range(iMinFirstAxis,iMaxFirstAxis+1)
+        for i in iTest:
+            if np.product([(self.tVec[dim][i]-tMinVec[dim] >= self.halfWindowVec[dim])*(tMaxVec[dim]-self.tVec[dim][i] >= self.halfWindowVec[dim]) for dim in range(1+self.alreadySorted,self.nDim)]):
                 self.intPoints.append(i)
-                correspTable[i] = pointInCounter
-                pointInCounter += 1
+                correspTable[i] = pointsInCounter
+                pointsInCounter += 1
                 intPointsPerCell[self.pointToCells[i]] += 1
                 while self.tVec[0][i]-self.tVec[0][iMinLoc] > self.halfWindowVec[0]:
                     iMinLoc += 1
                 while self.tVec[0][iMaxLoc+1]-self.tVec[0][i] < self.halfWindowVec[0]:
                     iMaxLoc += 1
                 for testPoint in range(iMinLoc,iMaxLoc+1):
-                    if np.product([abs(self.tVec[dim][testPoint]-self.tVec[dim][i])< self.halfWindowVec[dim] for dim in range(1,self.nDim)]):
+                    if np.product([abs(self.tVec[dim][testPoint]-self.tVec[dim][i])< self.halfWindowVec[dim] for dim in range(1+self.alreadySorted,self.nDim)]):
                         self.intMap[i].append(testPoint)
         self.tPostVec = [self.tVec[dim][self.intPoints] for dim in range(self.nDim)]
         self.partitionCellsPost = []
