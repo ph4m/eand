@@ -23,7 +23,7 @@ from eand.kmand import MonoDiff
 
 '''
 Image processing example: numerical differentiation for edge detection
-Original image: http://www.flickr.com/photos/96463597@N05/8843889414/ (CC-BY-NC-SA)
+Original image: http://www.flickr.com/photos/ph4m/ (CC-BY-NC-SA)
 '''
 
 # Loading picture
