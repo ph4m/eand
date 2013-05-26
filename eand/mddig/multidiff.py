@@ -141,18 +141,6 @@ class MultiDiff:
         except:
             print 'ERROR:', 'parameter sequence', self.paramVec, 'is not supported'
             exit()
-            
-    '''
-    def sortAlongFirstAxis(self,tVec):
-        tVecSorted = []
-        if self.alreadySorted:
-            self.sortInd = np.array(range(len(tVec[0])))
-        else:
-            self.sortInd = np.argsort(np.array(tVec[0]))
-        for t in tVec:
-            tVecSorted.append(np.array(t)[self.sortInd])
-        return (np.array(tVecSorted))
-    '''
     
     def sortSignal(self,signal):
         if self.alreadySorted:
@@ -198,6 +186,40 @@ class MultiDiff:
         dPost = np.array(dPost)
         return (self.tPostVec,dPost)
         
+    '''
+    def differentiate(self,signal):
+    '''
+    '''
+        Numerical differentiation method
+        Once the differentiator is constructed, can be applied to compute derivative estimates
+        Input:
+            signal: samples of the signal to differentiate
+        Outputs:
+            tPostVec: list of discreet estimation times for dimension 1 to nDim
+            dPost: derivative estimates
+    '''
+    '''
+        signalSorted = np.array(signal)[self.sortInd]
+        dPost = []
+        for i in self.intPoints:
+            processedCells = [0 for _ in range(self.nCells)]
+            dPostNum = 0.
+            dPostDen = 0.
+            for j in self.intMap[i]:
+                for cell in self.pointToCells[j]:
+                    if not processedCells[cell]:
+                        processedCells[cell] = 1
+                        coordRecentered = np.array(self.partitionCenters[cell]) - np.array([self.tVec[dim][i] for dim in range(self.nDim)])
+                        if self.isInWindow(coordRecentered):
+                            pVec = self.partitionCells[cell]
+                            gxyVec = [self.calcGxy([self.tVec[dim][p]-self.tVec[dim][i] for dim in range(self.nDim)]) for p in pVec]
+                            partialGxyVec = [self.calcPartialGxy([self.tVec[dim][p]-self.tVec[dim][i] for dim in range(self.nDim)]) for p in pVec]
+                            dPostNum = dPostNum + np.dot(partialGxyVec,signalSorted[pVec])*self.cellVol[cell]
+                            dPostDen = dPostDen + sum(gxyVec)*self.cellVol[cell]
+            dPost.append(dPostNum/dPostDen)
+        dPost = np.array(dPost)
+        return (self.tPostVec,dPost)
+    '''
     def buildIntMap(self):
         self.intMap = [[] for _ in range(self.nSamples)]
         tMinVec = [min(t) for t in self.tVec]
