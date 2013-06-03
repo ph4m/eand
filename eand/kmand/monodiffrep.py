@@ -17,7 +17,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import numpy as np
-from eand.kmand.monodiff import MonoDiff
+#from eand.kmand.monodiff import MonoDiff
+from monodiff import MonoDiff
 
 '''
 Derivative estimation through repeated (kappa,mu)-algebraic numerical differentiation

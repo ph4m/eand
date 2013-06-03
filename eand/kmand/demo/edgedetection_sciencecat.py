@@ -75,4 +75,9 @@ imgEdges = [[[0.5*(imgDiffByCol[row][col] + imgDiffByRow[row][col]) for _ in ran
 plt.figure()
 plt.imshow(imgEdges)
 
+# Threshold
+imgEdgesThreshold = [[[(imgEdges[row][col][chan] > 0.1)*imgEdges[row][col][chan] for chan in range(3)] for col in range(len(tColPost))] for row in range(len(tRowPost))]
+plt.figure()
+plt.imshow(imgEdgesThreshold)
+
 plt.show()
