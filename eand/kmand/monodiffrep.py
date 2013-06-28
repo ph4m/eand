@@ -48,6 +48,7 @@ class MonoDiffRep:
         differentiators: list of successive differentiators for order 0 to nTarget
     Once constructed, the differentiator can then be applied on different signals
     '''
+
     nTarget = 0
     qVec = []
     kappaVec = []
@@ -83,6 +84,7 @@ class MonoDiffRep:
         self.nVec = [i-max(rediffSeq[i],0) for i in range(nTarget+1)]
         self.NVec = self.nVec+self.qVec
         self.rediffSeq = rediffSeq
+        self.differentiators = []
         # Construct successive differentiators
         self.buildDifferentiators()
         

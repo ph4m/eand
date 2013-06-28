@@ -63,7 +63,6 @@ causality = 'causal';          # 'causal' or 'anticausal'
 
 # Construction of the (kappa,mu)-algebraic numerical differentiator
 monoDiff = MonoDiff(n,N,kappa,mu,M,Ts,xi,lambdaOptType,causality)
-
 # Differentiation of the noisy signal
 (tPost,dPost) = monoDiff.differentiate(t,signalNoisy)
 

@@ -62,6 +62,11 @@ xi = 0.5;                      # xi parameter for real lambda
 causality = 'causal';          # 'causal' or 'anticausal'
 rediffSeq = [-1,-1,1]          # estimates order to use for redifferentiation
 
+'''
+Ts = Ts/2.0
+t = np.array(t)/2.
+'''
+
 # Construction of the (kappa,mu)-algebraic numerical differentiator
 monoDiffRep = MonoDiffRep(nTarget,qVec,kappaVec,muVec,MVec,Ts,xi,lambdaOptType,causality,rediffSeq)
 
