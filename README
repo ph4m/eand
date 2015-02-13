@@ -22,8 +22,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 # 1. What is it? #
 ##################
 
-eand (Easy Algebraic Numerical Differentiation) is a
-package implementing numerical differentiation algorithms based on the
+eand (Easy Algebraic Numerical Differentiation) is a Python
+module implementing numerical differentiation algorithms based on the
 algebraic framework initiated in Fliess and Sira-Ramirez 2003 [1].
 
 ###############
@@ -36,12 +36,18 @@ The current version contains the following sub-packages:
      A one-dimensional derivative estimator working on regularly-spaced
      samples based on Mboup et al. 2009 [2].
      
-  b. mddif: MultiDimensional Differentiation on Irregular Grids
+  b. mddig: MultiDimensional Differentiation on Irregular Grids
      A multidimensional derivative estimator handling irregular sampling
      grids based on Riachy et al. 2011 [3].
 
+###################
+# 3. Installation #
+###################
+
+Dependencies: numpy, scipy, matplotlib.
+
 ##########################
-# 3. Future developments #
+# 4. Future developments #
 ##########################
 
 Future work will more or less deal with the following issues:
@@ -49,7 +55,7 @@ Future work will more or less deal with the following issues:
   b. Fine-tuning of differentiation parameters
 
 #################
-# 4. References #
+# 5. References #
 #################
 
 [1] FLIESS, M., AND SIRA-RAMIREZ, H. 2003.
