@@ -2,7 +2,7 @@
 # 0. License #
 ##############
 
-eand.py package (Easy Algebraic Numerical Differentiation for Python)
+eand package (Easy Algebraic Numerical Differentiation)
 Copyright (C) 2013 Tu-Hoa Pham
 
 This program is free software; you can redistribute it and/or modify
@@ -22,7 +22,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 # 1. What is it? #
 ##################
 
-eand.py (Easy Algebraic Numerical Differentiation for Python) is a
+eand (Easy Algebraic Numerical Differentiation) is a
 package implementing numerical differentiation algorithms based on the
 algebraic framework initiated in Fliess and Sira-Ramirez 2003 [1].
 

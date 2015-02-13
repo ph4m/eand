@@ -1,5 +1,5 @@
 '''
-eand.py package (Easy Algebraic Numerical Differentiation for Python)
+eand package (Easy Algebraic Numerical Differentiation)
 Copyright (C) 2013 Tu-Hoa Pham
 
 This program is free software; you can redistribute it and/or modify

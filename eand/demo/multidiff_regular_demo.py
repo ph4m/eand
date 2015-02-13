@@ -1,5 +1,5 @@
 '''
-eand.py package (Easy Algebraic Numerical Differentiation for Python)
+eand package (Easy Algebraic Numerical Differentiation)
 Copyright (C) 2013 Tu-Hoa Pham
 
 This program is free software; you can redistribute it and/or modify
@@ -29,11 +29,15 @@ t1Max = 1.0
 t2Min = -1.0
 t2Max = 1.0
 
-t1 = np.array([0. for _ in range(Ns)])
-t2 = np.array([0. for _ in range(Ns)])
-for i in range(Ns):
-    t1[i] = t1Min+(t1Max-t1Min)*np.random.random()
-    t2[i] = t2Min+(t2Max-t2Min)*np.random.random()
+nSamplesSorted = [25,25]
+dtVec = [(t1Max-t1Min)/nSamplesSorted[0],(t2Max-t2Min)/nSamplesSorted[1]]
+tProto = np.arange(-1.,1.05,0.05)
+t1 = []
+t2 = []
+for i in tProto:
+    for j in tProto:
+        t1.append(i)
+        t2.append(j)
 
 n1 = 1
 alpha1 = 3
@@ -58,8 +62,16 @@ nSamples = len(tVec[0])
 
 signal = [cos(2*sum([t[i] for t in tVec])) for i in range(nSamples)]
 
+tVec = np.array(tVec)
+alreadySorted = 2
+nSamplesSorted = [len(tProto),len(tProto)]
+
+toNextValueSorted = [round(np.product([nSamplesSorted[dim] for dim in range(i+1,alreadySorted)])) for i in range(alreadySorted)]
+
+dtVec = [tVec[i][toNextValueSorted[i]]-tVec[i][0] for i in range(alreadySorted)]
+
 print 'Building differentiator...'
-multiDiff = MultiDiff(paramVec,tVec)
+multiDiff = MultiDiff(paramVec,tVec,alreadySorted,nSamplesSorted)
 
 print 'Plotting partition...'
 multiDiff.plotPartition(0)
@@ -82,5 +94,6 @@ multiDiff.plotSurface(tPostVec, dPost,0)
 plt.show()
 
 print 'SUCCESS!'
-
+'''
+'''
 

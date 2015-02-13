@@ -1,5 +1,5 @@
 '''
-eand.py package (Easy Algebraic Numerical Differentiation for Python)
+eand package (Easy Algebraic Numerical Differentiation)
 Copyright (C) 2013 Tu-Hoa Pham
 
 This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@ from eand.mddig.multidiff import MultiDiff
 
 print 'Initializing estimation parameters...'
 
-Ns = 1000
+Ns = 500
 t1Min = -1.0
 t1Max = 1.0
 t2Min = -1.0
@@ -36,8 +36,8 @@ for i in range(Ns):
     t2[i] = t2Min+(t2Max-t2Min)*np.random.random()
 
 n1 = 1
-alpha1 = 1
-beta1 = 1
+alpha1 = 3
+beta1 = 3
 n2 = 0
 alpha2 = 0
 beta2 = 0
@@ -53,9 +53,12 @@ tVec = [t1]
 paramVec = [[n1,alpha1,beta1,T1],[n2,alpha2,beta2,T2]]
 tVec = [t1,t2]
 
-signal = [cos(2*sum([t[i] for t in tVec])) for i in range(len(tVec[0]))]
+nDim = len(tVec)
+nSamples = len(tVec[0])
 
-print 'Buiding differentiator...'
+signal = [cos(2*sum([t[i] for t in tVec])) for i in range(nSamples)]
+
+print 'Building differentiator...'
 multiDiff = MultiDiff(paramVec,tVec)
 
 print 'Plotting partition...'
@@ -65,15 +68,16 @@ print 'Commencing differentiation...'
 (tPostVec,dPost) = multiDiff.differentiate(signal)
 
 print 'Calculating reference derivative...'
-tSlice,dSlice = multiDiff.plotSlice(tPostVec,dPost,1,0.,0.1)
-dRef = []
-for i in tSlice:
-    dRef.append(-2*sin(2*i))
+tSlice,dSlice = multiDiff.plotSlice(tPostVec,dPost,1,0.,0.1,0)
+if sum([paramVec[i][0] for i in range(nDim)]) == 1:
+    dRef = [-2*sin(2*i) for i in tSlice]
+elif sum([paramVec[i][0] for i in range(nDim)]) == 2:
+    dRef = [-4*cos(2*i) for i in tSlice]
 plt.plot(tSlice,dRef,'r.')
 
 print 'Plotting derivative estimate...'
-multiDiff.plotScatter(tPostVec, dPost)
-multiDiff.plotSurface(tPostVec, dPost)
+multiDiff.plotScatter(tPostVec, dPost,0)
+multiDiff.plotSurface(tPostVec, dPost,0)
 
 plt.show()
 

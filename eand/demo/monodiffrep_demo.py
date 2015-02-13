@@ -1,5 +1,5 @@
 '''
-eand.py package (Easy Algebraic Numerical Differentiation for Python)
+eand package (Easy Algebraic Numerical Differentiation)
 Copyright (C) 2013 Tu-Hoa Pham
 
 This program is free software; you can redistribute it and/or modify
@@ -19,10 +19,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import numpy as np
 from math import tanh, exp, cos, sin, pi, cosh, sqrt
 import matplotlib.pyplot as plt
-from eand.kmand.monodiff import MonoDiff
+from eand.kmand.monodiffrep import MonoDiffRep
 
 '''
-Demonstration for monodimensional derivative estimation with algebraic numerical differentiation
+Demonstration for derivative estimation through repeated (kappa,mu)-algebraic numerical differentiation
 See 'Numerical differentiation with annihilators in noisy environments' (Mboup et al., 2009)
 '''
 
@@ -52,20 +52,21 @@ noise = np.random.normal(noise_mean,noise_sd,Ns)
 signalNoisy = signalRefSeq[0] + noise
 
 # Numerical differentiation parameters
-n = 1;                         # derivative order to estimate
-N = 1;                         # Taylor expansion order
-kappa = 0;                     # differentiator parameter
-mu = 0;                        # differentiator parameter
-M = 40;                        # estimation samples
+nTarget = 2;                   # derivative order to estimate
+qVec = [0,0,0];                # model complexity parameters
+kappaVec = [0,0,0];            # differentiator parameters
+muVec = [0,0,0];               # differentiator parameters
+MVec = [60,60,60];            # estimation samples
 lambdaOptType= 'noisyenv';     # 'mismodel' or 'noisyenv'
 xi = 0.5;                      # xi parameter for real lambda
 causality = 'causal';          # 'causal' or 'anticausal'
+rediffSeq = [-1,-1,1]          # estimates order to use for redifferentiation
 
 # Construction of the (kappa,mu)-algebraic numerical differentiator
-monoDiff = MonoDiff(n,N,kappa,mu,M,Ts,xi,lambdaOptType,causality)
+monoDiffRep = MonoDiffRep(nTarget,qVec,kappaVec,muVec,MVec,Ts,xi,lambdaOptType,causality,rediffSeq)
 
 # Differentiation of the noisy signal
-(tPost,dPost) = monoDiff.differentiate(t,signalNoisy)
+(tPostSeq,dPostSeq) = monoDiffRep.differentiate(t,signalNoisy)
 
 # Plot initial noisy signal
 plt.figure(-1)
@@ -77,13 +78,14 @@ plt.axvline(color='k')
 plt.legend()
 plt.title('Initial noisy signal')
 
-# Plot derivative estimate
-plt.figure(n)
-plt.plot(t, signalRefSeq[n], 'b', label='reference')
-plt.plot(tPost, dPost, 'r', label='estimate')
-plt.grid()
-plt.axhline(color='k')
-plt.axvline(color='k')
-plt.legend()
-plt.title('Order %d derivative estimate' % (n))
+# Plot successive derivative estimates
+for n in range(nTarget+1):
+    plt.figure(n)
+    plt.plot(t, signalRefSeq[n], 'b', label='reference')
+    plt.plot(tPostSeq[n], dPostSeq[n], 'r', label='estimate')
+    plt.grid()
+    plt.axhline(color='k')
+    plt.axvline(color='k')
+    plt.legend()
+    plt.title('Order %d derivative estimate' % (n))
 plt.show()
