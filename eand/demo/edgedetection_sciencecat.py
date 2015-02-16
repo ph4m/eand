@@ -40,7 +40,8 @@ Ts = 1.
 xi = 0.5
 lambdaOptType = 'noisyenv'
 causality = 'causal'
-monoDiff = MonoDiff(n,N,kappa,mu,M,Ts,xi,lambdaOptType,causality)
+flagCompleteTime = 'none'
+monoDiff = MonoDiff(n,N,kappa,mu,M,Ts,xi,lambdaOptType,causality,flagCompleteTime)
 
 # Taking RGB mean
 nCol,nRow = picture.size

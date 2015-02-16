@@ -60,10 +60,11 @@ MVec = [60,60,60];            # estimation samples
 lambdaOptType= 'noisyenv';     # 'mismodel' or 'noisyenv'
 xi = 0.5;                      # xi parameter for real lambda
 causality = 'causal';          # 'causal' or 'anticausal'
+flagCompleteTime = 'none';     # complete tPost into t: 'none', 'zero', 'findiff'
 rediffSeq = [-1,-1,1]          # estimates order to use for redifferentiation
 
 # Construction of the (kappa,mu)-algebraic numerical differentiator
-monoDiffRep = MonoDiffRep(nTarget,qVec,kappaVec,muVec,MVec,Ts,xi,lambdaOptType,causality,rediffSeq)
+monoDiffRep = MonoDiffRep(nTarget,qVec,kappaVec,muVec,MVec,Ts,xi,lambdaOptType,causality,flagCompleteTime,rediffSeq)
 
 # Differentiation of the noisy signal
 (tPostSeq,dPostSeq) = monoDiffRep.differentiate(t,signalNoisy)

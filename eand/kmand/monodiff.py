@@ -66,7 +66,7 @@ class MonoDiff:
     W = np.array([])
     delay = 0.
 
-    def __init__(self,n,N,kappa,mu,M,Ts,xi,lambdaOptType,causality,flagCompleteTime='zero'):
+    def __init__(self,n,N,kappa,mu,M,Ts,xi,lambdaOptType,causality,flagCompleteTime):
         '''
         Constructor
         '''
@@ -80,7 +80,7 @@ class MonoDiff:
         self.xi = xi
         self.lambdaOptType = lambdaOptType
         self.causality = causality
-	self.flagCompleteTime = flagCompleteTime
+        self.flagCompleteTime = flagCompleteTime
 
         # Auxiliary parameters
         self.T = M*Ts

@@ -58,6 +58,7 @@ class MonoDiffRep:
     xi = 0.
     lambdaOptType = ''
     causality = ''
+    flagCompleteTime = 'zero'
     rediffSeq = []
     TVec = []
     nVec = []
@@ -66,7 +67,7 @@ class MonoDiffRep:
     lambdaVec = np.array([])
     differentiators = []
 
-    def __init__(self,nTarget,qVec,kappaVec,muVec,MVec,Ts,xi,lambdaOptType,causality,rediffSeq):
+    def __init__(self,nTarget,qVec,kappaVec,muVec,MVec,Ts,xi,lambdaOptType,causality,flagCompleteTime,rediffSeq):
         '''
         Constructor
         '''
@@ -80,6 +81,7 @@ class MonoDiffRep:
         self.lambdaOptType = lambdaOptType
         self.xi = xi
         self.causality = causality
+        self.flagCompleteTime = flagCompleteTime
         self.TVec = self.MVec*Ts
         self.nVec = [i-max(rediffSeq[i],0) for i in range(nTarget+1)]
         self.NVec = self.nVec+self.qVec
@@ -98,7 +100,7 @@ class MonoDiffRep:
             kappa = self.kappaVec[order]
             mu = self.muVec[order]
             M = self.MVec[order]
-            diffLoc = MonoDiff(n,N,kappa,mu,M,self.Ts,self.xi,self.lambdaOptType,self.causality)
+            diffLoc = MonoDiff(n,N,kappa,mu,M,self.Ts,self.xi,self.lambdaOptType,self.causality,self.flagCompleteTime)
             self.differentiators.append(diffLoc)
     
     def differentiate(self,t,signal):
