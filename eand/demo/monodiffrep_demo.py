@@ -52,19 +52,20 @@ noise = np.random.normal(noise_mean,noise_sd,Ns)
 signalNoisy = signalRefSeq[0] + noise
 
 # Numerical differentiation parameters
-nTarget = 2;                   # derivative order to estimate
-qVec = [0,0,0];                # model complexity parameters
-kappaVec = [0,0,0];            # differentiator parameters
-muVec = [0,0,0];               # differentiator parameters
-MVec = [60,60,60];            # estimation samples
-lambdaOptType= 'noisyenv';     # 'mismodel' or 'noisyenv'
-xi = 0.5;                      # xi parameter for real lambda
-causality = 'causal';          # 'causal' or 'anticausal'
-flagCompleteTime = 'none';     # complete tPost into t: 'none', 'zero', 'findiff'
-rediffSeq = [-1,-1,1]          # estimates order to use for redifferentiation
+monoDiffRepCfg = {'nTarget': 2,                   # derivative order to estimate
+                  'qVec': [0,0,0],                # model complexity parameters
+                  'kappaVec': [0,0,0],            # differentiator parameters
+                  'muVec': [0,0,0],               # differentiator parameters
+                  'MVec': [60,60,60],             # estimation samples
+                  'Ts': Ts,
+                  'xi': 0.5,                      # xi parameter for real lambda
+                  'lambdaOptType': 'noisyenv',    # 'mismodel' or 'noisyenv'
+                  'causality': 'causal',          # 'causal' or 'anticausal'
+                  'flagCompleteTime': 'none',     # complete tPost into t: 'none', 'zero', 'findiff'
+                  'rediffSeq': [-1,-1,1]}         # estimates order to use for redifferentiation
 
 # Construction of the (kappa,mu)-algebraic numerical differentiator
-monoDiffRep = MonoDiffRep(nTarget,qVec,kappaVec,muVec,MVec,Ts,xi,lambdaOptType,causality,flagCompleteTime,rediffSeq)
+monoDiffRep = MonoDiffRep(monoDiffRepCfg)
 
 # Differentiation of the noisy signal
 (tPostSeq,dPostSeq) = monoDiffRep.differentiate(t,signalNoisy)
@@ -80,7 +81,7 @@ plt.legend()
 plt.title('Initial noisy signal')
 
 # Plot successive derivative estimates
-for n in range(nTarget+1):
+for n in range(monoDiffRepCfg['nTarget']+1):
     plt.figure(n)
     plt.plot(t, signalRefSeq[n], 'b', label='reference')
     plt.plot(tPostSeq[n], dPostSeq[n], 'r', label='estimate')

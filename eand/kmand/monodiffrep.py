@@ -67,25 +67,27 @@ class MonoDiffRep:
     lambdaVec = np.array([])
     differentiators = []
 
-    def __init__(self,nTarget,qVec,kappaVec,muVec,MVec,Ts,xi,lambdaOptType,causality,flagCompleteTime,rediffSeq):
+    def __init__(self,cfg):
         '''
         Constructor
         '''
         # Initialize main parameters
-        self.nTarget = nTarget
-        self.qVec = np.array(qVec)
-        self.kappaVec = np.array(kappaVec)
-        self.muVec = np.array(muVec)
-        self.MVec = np.array(MVec)
-        self.Ts = Ts
-        self.lambdaOptType = lambdaOptType
-        self.xi = xi
-        self.causality = causality
-        self.flagCompleteTime = flagCompleteTime
-        self.TVec = self.MVec*Ts
-        self.nVec = [i-max(rediffSeq[i],0) for i in range(nTarget+1)]
+        self.nTarget = cfg['nTarget']
+        self.qVec = np.array(cfg['qVec'])
+        self.kappaVec = np.array(cfg['kappaVec'])
+        self.muVec = np.array(cfg['muVec'])
+        self.MVec = np.array(cfg['MVec'])
+        self.Ts = cfg['Ts']
+        self.lambdaOptType = cfg['lambdaOptType']
+        self.xi = cfg['xi']
+        self.causality = cfg['causality']
+        self.flagCompleteTime = cfg['flagCompleteTime']
+        self.rediffSeq = cfg['rediffSeq']
+
+        # Auxiliary parameters
+        self.TVec = self.MVec*self.Ts
+        self.nVec = [i-max(self.rediffSeq[i],0) for i in range(self.nTarget+1)]
         self.NVec = self.nVec+self.qVec
-        self.rediffSeq = rediffSeq
         self.differentiators = []
         # Construct successive differentiators
         self.buildDifferentiators()
@@ -100,7 +102,17 @@ class MonoDiffRep:
             kappa = self.kappaVec[order]
             mu = self.muVec[order]
             M = self.MVec[order]
-            diffLoc = MonoDiff(n,N,kappa,mu,M,self.Ts,self.xi,self.lambdaOptType,self.causality,self.flagCompleteTime)
+            monoDiffCfg = {'n':n,
+                           'N':N,
+                           'kappa':kappa,
+                           'mu':mu,
+                           'M':M,
+                           'Ts':self.Ts,
+                           'xi':self.xi,
+                           'lambdaOptType':self.lambdaOptType,
+                           'causality':self.causality,
+                           'flagCompleteTime':self.flagCompleteTime}
+            diffLoc = MonoDiff(monoDiffCfg)
             self.differentiators.append(diffLoc)
     
     def differentiate(self,t,signal):

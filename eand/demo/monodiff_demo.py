@@ -52,18 +52,19 @@ noise = np.random.normal(noise_mean,noise_sd,Ns)
 signalNoisy = signalRefSeq[0] + noise
 
 # Numerical differentiation parameters
-n = 1;                         # derivative order to estimate
-N = 1;                         # Taylor expansion order
-kappa = 0;                     # differentiator parameter
-mu = 0;                        # differentiator parameter
-M = 40;                        # estimation samples
-lambdaOptType= 'noisyenv';     # 'mismodel' or 'noisyenv'
-xi = 0.5;                      # xi parameter for real lambda
-causality = 'causal';          # 'causal' or 'anticausal'
-flagCompleteTime = 'none';     # complete tPost into t: 'none', 'zero', 'findiff'
+monoDiffCfg = {'n': 1,                         # derivative order to estimate
+               'N': 1,                         # Taylor expansion order
+               'kappa': 0,                     # differentiator parameter
+               'mu': 0,                        # differentiator parameter
+               'M': 40,                        # estimation samples
+               'Ts': Ts,                       # sampling period
+               'xi': 0.5,                      # xi parameter for real lambda
+               'lambdaOptType': 'noisyenv',    # 'mismodel' or 'noisyenv'
+               'causality': 'causal',          # 'causal' or 'anticausal'
+               'flagCompleteTime': 'none'}     # complete tPost into t: 'none', 'zero', 'findiff'
 
 # Construction of the (kappa,mu)-algebraic numerical differentiator
-monoDiff = MonoDiff(n,N,kappa,mu,M,Ts,xi,lambdaOptType,causality,flagCompleteTime)
+monoDiff = MonoDiff(monoDiffCfg)
 # Differentiation of the noisy signal
 (tPost,dPost) = monoDiff.differentiate(t,signalNoisy)
 
@@ -78,12 +79,12 @@ plt.legend()
 plt.title('Initial noisy signal')
 
 # Plot derivative estimate
-plt.figure(n)
-plt.plot(t, signalRefSeq[n], 'b', label='reference')
+plt.figure(monoDiffCfg['n'])
+plt.plot(t, signalRefSeq[monoDiffCfg['n']], 'b', label='reference')
 plt.plot(tPost, dPost, 'r', label='estimate')
 plt.grid()
 plt.axhline(color='k')
 plt.axvline(color='k')
 plt.legend()
-plt.title('Order %d derivative estimate' % (n))
+plt.title('Order %d derivative estimate' % (monoDiffCfg['n']))
 plt.show()

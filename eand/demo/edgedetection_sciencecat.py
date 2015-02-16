@@ -31,17 +31,18 @@ picture = Image.open('sciencecat.jpg')
 data = list(picture.getdata())
 
 # Differentiator initialization
-n = 1
-N = 1
-kappa = 0
-mu = 0
-M = 5
-Ts = 1.
-xi = 0.5
-lambdaOptType = 'noisyenv'
-causality = 'causal'
-flagCompleteTime = 'none'
-monoDiff = MonoDiff(n,N,kappa,mu,M,Ts,xi,lambdaOptType,causality,flagCompleteTime)
+
+monoDiffCfg = {'n': 1,                         # derivative order to estimate
+               'N': 1,                         # Taylor expansion order
+               'kappa': 0,                     # differentiator parameter
+               'mu': 0,                        # differentiator parameter
+               'M': 5,                         # estimation samples
+               'Ts': 1.,                       # sampling period
+               'xi': 0.5,                      # xi parameter for real lambda
+               'lambdaOptType': 'noisyenv',    # 'mismodel' or 'noisyenv'
+               'causality': 'causal',          # 'causal' or 'anticausal'
+               'flagCompleteTime': 'none'}     # complete tPost into t: 'none', 'zero', 'findiff'
+monoDiff = MonoDiff(monoDiffCfg)
 
 # Taking RGB mean
 nCol,nRow = picture.size

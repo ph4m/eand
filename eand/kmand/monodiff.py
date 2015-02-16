@@ -66,25 +66,25 @@ class MonoDiff:
     W = np.array([])
     delay = 0.
 
-    def __init__(self,n,N,kappa,mu,M,Ts,xi,lambdaOptType,causality,flagCompleteTime):
+    def __init__(self,cfg):
         '''
         Constructor
         '''
         # Initialize main parameters
-        self.n = n
-        self.N = N
-        self.kappa = kappa
-        self.mu = mu
-        self.M = M
-        self.Ts = Ts
-        self.xi = xi
-        self.lambdaOptType = lambdaOptType
-        self.causality = causality
-        self.flagCompleteTime = flagCompleteTime
+        self.n = cfg['n']
+        self.N = cfg['N']
+        self.kappa = cfg['kappa']
+        self.mu = cfg['mu']
+        self.M = cfg['M']
+        self.Ts = cfg['Ts']
+        self.xi = cfg['xi']
+        self.lambdaOptType = cfg['lambdaOptType']
+        self.causality = cfg['causality']
+        self.flagCompleteTime = cfg['flagCompleteTime']
 
         # Auxiliary parameters
-        self.T = M*Ts
-        self.q = N-n
+        self.T = self.M*self.Ts
+        self.q = self.N-self.n
         # initialization of vector lambda
         self.buildLambdaVec()
         # computation of h coefficients and construction of vector g
