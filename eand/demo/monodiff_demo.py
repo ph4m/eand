@@ -60,9 +60,10 @@ M = 40;                        # estimation samples
 lambdaOptType= 'noisyenv';     # 'mismodel' or 'noisyenv'
 xi = 0.5;                      # xi parameter for real lambda
 causality = 'causal';          # 'causal' or 'anticausal'
+flagCompleteTime = 'none';     # complete tPost into t: 'none', 'zero', 'findiff'
 
 # Construction of the (kappa,mu)-algebraic numerical differentiator
-monoDiff = MonoDiff(n,N,kappa,mu,M,Ts,xi,lambdaOptType,causality)
+monoDiff = MonoDiff(n,N,kappa,mu,M,Ts,xi,lambdaOptType,causality,flagCompleteTime)
 # Differentiation of the noisy signal
 (tPost,dPost) = monoDiff.differentiate(t,signalNoisy)
 

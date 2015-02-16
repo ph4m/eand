@@ -37,6 +37,7 @@ class MonoDiff:
         xi: parameter for estimation delay
         lambdaOptType: estimation error type to optimize ('mismodel' or 'noisyenv')
         causality: observation direction along time ('causal' or 'anticausal')
+        flagCompleteTime: output completion into initial time sampling ('none', 'zero', 'findiff')
     From there, additional elements composing the differentiator can be computed:
         T: observation time for each estimate
         q: model complexity parameter
@@ -56,6 +57,7 @@ class MonoDiff:
     xi = 0.
     lambdaOptType = ''
     causality = ''
+    flagCompleteTime = 'zero'
     T = 0.
     q = 0
     lambdaElType = ''
@@ -64,7 +66,7 @@ class MonoDiff:
     W = np.array([])
     delay = 0.
 
-    def __init__(self,n,N,kappa,mu,M,Ts,xi,lambdaOptType,causality):
+    def __init__(self,n,N,kappa,mu,M,Ts,xi,lambdaOptType,causality,flagCompleteTime='zero'):
         '''
         Constructor
         '''
@@ -78,7 +80,8 @@ class MonoDiff:
         self.xi = xi
         self.lambdaOptType = lambdaOptType
         self.causality = causality
-        
+	self.flagCompleteTime = flagCompleteTime
+
         # Auxiliary parameters
         self.T = M*Ts
         self.q = N-n
@@ -90,7 +93,7 @@ class MonoDiff:
         self.buildWVec()
         # calculate delay
         self.calcDelay()
-    
+
     def differentiate(self,t,signal):
         '''
         Numerical differentiation method
@@ -121,8 +124,35 @@ class MonoDiff:
             dPost = dPost[:len(dPost)-lag]
             tPost = t[:Ns-self.M]
             tPost = tPost[len(tPost)-len(dPost):]
+        # Complete tPost into t with finite difference
+        if self.flagCompleteTime == 'zero' or self.flagCompleteTime == 'findiff':
+            iCompleteBounds = [list(t).index(tPost[0]),list(t).index(tPost[len(tPost)-1])]
+            tCompleteBegin = []
+            dCompleteBegin = []
+            tCompleteEnd = []
+            dCompleteEnd = []
+            if iCompleteBounds[0] > 0:
+                tCompleteBegin.append(t[0])
+                dCompleteBegin.append((signal[1]-signal[0])/(t[1]-t[0]))
+                for iComplete in range(1,iCompleteBounds[0]):
+                    tCompleteBegin.append(t[iComplete])
+                    if self.flagCompleteTime == 'zero':
+                        dCompleteBegin.append(0.0)
+                    elif self.flagCompleteTime == 'findiff':
+                        dCompleteBegin.append((signal[iComplete+1]-signal[iComplete-1])/(t[iComplete+1]-t[iComplete-1]))
+            if iCompleteBounds[1] < len(t)-1:
+                for iComplete in range(iCompleteBounds[1]+1,(len(t)-1)):
+                    tCompleteEnd.append(t[iComplete])
+                    if self.flagCompleteTime == 'zero':
+                        dCompleteEnd.append(0.0)
+                    elif self.flagCompleteTime == 'findiff':
+                        dCompleteEnd.append((signal[iComplete+1]-signal[iComplete-1])/(t[iComplete+1]-t[iComplete-1]))
+                tCompleteEnd.append(t[len(t)-1])
+                dCompleteEnd.append((signal[len(t)-1]-signal[len(t)-2])/(t[len(t)-1]-t[len(t)-2]))
+            tPost = tCompleteBegin + list(tPost) + tCompleteEnd
+            dPost = dCompleteBegin + list(dPost) + dCompleteEnd
         return (tPost,dPost)
-        
+
     def calcDelay(self):
         '''
         Compute estimate time delay
@@ -144,7 +174,7 @@ class MonoDiff:
         W[0] = 1./(2*self.M)
         W[self.M] = 1./(2*self.M)
         self.W = W
-    
+
     def buildGVec(self):
         '''
         Main vector characterizing the differentiator in FIR filter form
@@ -157,7 +187,7 @@ class MonoDiff:
                 h[l] = self.calcHkm(tau,self.kappa+self.q-l,self.mu+l,self.n,self.T,self.causality);
             g[m] = sum(self.lambdaVec*h)
         self.g = g
-        
+
     def buildLambdaVec(self):
         '''
         Build vector lambda according to estimation parameters and error source to minimize
@@ -203,14 +233,14 @@ class MonoDiff:
         '''
         aij = comb(q,i)*comb(p,j-i)*factorial(q+1)/((q+1-i)*factorial(q-j))
         return aij
-        
+
     def calcBlq(self,tau,l,q):
         '''
         Compute blq coefficients
         '''
         blq = comb(q,l)*tau**(q-l)*(1-tau)**l
         return blq
-    
+
     def calcHkm(self,tau,kappa,mu,n,T,causality):
         '''
         Compute hkm coefficients
@@ -226,7 +256,7 @@ class MonoDiff:
         '''
         gamma = factorial(mu+kappa+2*n+1)/(factorial(mu+n)*factorial(kappa+n))
         return gamma
-    
+
     def calcDnw(self,t,kappa,mu,n):
         '''
         Compute exact derivatives of the Jacobi polynomials weight function
@@ -235,11 +265,11 @@ class MonoDiff:
         kappaMax = 6;
         muMax = 6;
         nMax = 2;
-        
+
         # Index of the weight function derivative
         case = kappa*(muMax+1)*(nMax+1) + mu*(nMax+1) + n + 1;
-        
-        # Find the corresponding exact derivative    
+
+        # Find the corresponding exact derivative
         if case > (kappaMax+1)*(muMax+1)*(nMax+1):
             print kappa, mu, n, 'combination not supported'
         else:
