@@ -106,6 +106,7 @@ class MonoDiff:
             dPost: derivative estimates
         '''
         Ns = len(t)
+        dt = (t[Ns-1]-t[0])/Ns
         dEst = np.array([0. for _ in range(Ns)])
         lag = round(self.delay/self.Ts)
         if self.causality == 'causal':
@@ -132,23 +133,53 @@ class MonoDiff:
             tCompleteEnd = []
             dCompleteEnd = []
             if iCompleteBounds[0] > 0:
-                tCompleteBegin.append(t[0])
-                dCompleteBegin.append((signal[1]-signal[0])/(t[1]-t[0]))
-                for iComplete in range(1,iCompleteBounds[0]):
-                    tCompleteBegin.append(t[iComplete])
-                    if self.flagCompleteTime == 'zero':
-                        dCompleteBegin.append(0.0)
-                    elif self.flagCompleteTime == 'findiff':
-                        dCompleteBegin.append((signal[iComplete+1]-signal[iComplete-1])/(t[iComplete+1]-t[iComplete-1]))
-            if iCompleteBounds[1] < len(t)-1:
-                for iComplete in range(iCompleteBounds[1]+1,(len(t)-1)):
-                    tCompleteEnd.append(t[iComplete])
-                    if self.flagCompleteTime == 'zero':
-                        dCompleteEnd.append(0.0)
-                    elif self.flagCompleteTime == 'findiff':
-                        dCompleteEnd.append((signal[iComplete+1]-signal[iComplete-1])/(t[iComplete+1]-t[iComplete-1]))
-                tCompleteEnd.append(t[len(t)-1])
-                dCompleteEnd.append((signal[len(t)-1]-signal[len(t)-2])/(t[len(t)-1]-t[len(t)-2]))
+                tCompleteBegin = [t[i] for i in range(0,iCompleteBounds[0])]
+                if self.flagCompleteTime == 'zero':
+                    if self.n == 0:
+                        valAverageBegin = np.mean([signal[i] for i in range(0,iCompleteBounds[0])])
+                        for iComplete in range(0,iCompleteBounds[0]):
+                            dCompleteBegin.append(valAverageBegin)
+                    else:
+                        for iComplete in range(0,iCompleteBounds[0]):
+                            dCompleteBegin.append(0.0)
+                elif self.flagCompleteTime == 'findiff':
+                    if self.n == 0:
+                        for iComplete in range(0,iCompleteBounds[0]):
+                            dCompleteBegin.append(signal[iComplete])
+                    elif self.n == 1:
+                        dCompleteBegin.append((signal[1]-signal[0])/(dt))
+                        for iComplete in range(1,iCompleteBounds[0]):
+                            dCompleteBegin.append((signal[iComplete+1]-signal[iComplete-1])/(2*dt))
+                    elif self.n == 2:
+                        dCompleteBegin.append((signal[2]-2*signal[1]+signal[0])/(dt**2))
+                        for iComplete in range(1,iCompleteBounds[0]):
+                            dCompleteBegin.append((signal[iComplete+1]-2*signal[0]+signal[iComplete-1])/(dt**2))
+                    else:
+                        pass
+            if iCompleteBounds[1] < Ns-1:
+                tCompleteEnd = [t[i] for i in range(iCompleteBounds[1]+1,Ns)]
+                if self.flagCompleteTime == 'zero':
+                    if self.n == 0:
+                        valAverageEnd = np.mean([signal[i] for i in range(iCompleteBounds[1]+1,Ns)])
+                        for iComplete in range(iCompleteBounds[1]+1,Ns):
+                            dCompleteEnd.append(valAverageEnd)
+                    else:
+                        for iComplete in range(iCompleteBounds[1]+1,Ns):
+                            dCompleteEnd.append(0.0)
+                elif self.flagCompleteTime == 'findiff':
+                    if self.n == 0:
+                        for iComplete in range(iCompleteBounds[1]+1,Ns):
+                            dCompleteEnd.append(signal[iComplete])
+                    elif self.n == 1:
+                        for iComplete in range(iCompleteBounds[1]+1,Ns-1):
+                            dCompleteEnd.append((signal[iComplete+1]-signal[iComplete-1])/(2*dt))
+                        dCompleteEnd.append((signal[Ns-1]-signal[Ns-2])/(dt))
+                    elif self.n == 2:
+                        for iComplete in range(iCompleteBounds[1]+1,Ns-1):
+                            dCompleteEnd.append((signal[iComplete+1]-2*signal[0]+signal[iComplete-1])/(dt**2))
+                        dCompleteEnd.append((signal[Ns-1]-2*signal[Ns-2]+signal[Ns-3])/(dt**2))
+                    else:
+                        pass
             tPost = tCompleteBegin + list(tPost) + tCompleteEnd
             dPost = dCompleteBegin + list(dPost) + dCompleteEnd
         return (tPost,dPost)
